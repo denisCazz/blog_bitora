@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  ADMIN
+  CREATOR
+  PLUS
+  READER
+}
+
+enum ArticleVisibility {
+  PUBLIC
+  PROFILE_ONLY
+}
+
+model User {
+  id                       String   @id @default(cuid())
+  email                    String   @unique @db.VarChar(255)
+  name                     String   @db.VarChar(100)
+  passwordHash             String   @db.VarChar(255)
+  role                     UserRole @default(READER)
+  onboardingComplete       Boolean  @default(false)
+  preferredCategories      String?  @db.Text
+  aiArticlesUsedToday      Int      @default(0)
+  aiArticlesResetDate      DateTime @default(now())
+  creatorArticlesUsedMonth Int      @default(0)
+  creatorArticlesResetDate DateTime @default(now())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  sessions Session[]
+  articles Article[]
+  comments Comment[]
+  votes    Vote[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique @db.VarChar(128)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Article {
+  id          String            @id @default(cuid())
+  title       String            @db.VarChar(500)
+  slug        String            @unique @db.VarChar(500)
+  summary     String            @db.Text
+  content     String            @db.LongText
+  imageUrl    String?           @db.VarChar(1000)
+  category    String            @db.VarChar(100)
+  tags        String            @db.Text
+  source      String?           @db.VarChar(500)
+  sourceUrl   String?           @db.VarChar(1000)
+  readingTime Int               @default(3)
+  upvotes     Int               @default(0)
+  promoted    Boolean           @default(false)
+  published   Boolean           @default(true)
+  isDraft     Boolean           @default(false)
+  visibility  ArticleVisibility @default(PUBLIC)
+  authorId    String?
+  author      User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  comments Comment[]
+  votes    Vote[]
+
+  @@index([category])
+  @@index([createdAt])
+  @@index([upvotes])
+  @@index([authorId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author    String   @db.VarChar(100)
+  content   String   @db.Text
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([articleId])
+  @@index([userId])
+}
+
+model Vote {
+  id          String   @id @default(cuid())
+  articleId   String
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  fingerprint String   @db.VarChar(64)
+  value       Int
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@unique([articleId, fingerprint])
+  @@index([articleId])
+  @@index([userId])
+}
+
+model SearchLog {
+  id        String   @id @default(cuid())
+  query     String   @db.VarChar(500)
+  results   Int      @default(0)
+  createdAt DateTime @default(now())
+}

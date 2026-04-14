@@ -1,26 +1,147 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Markdown content styles */
+.prose-custom h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose-custom h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.prose-custom h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom p {
+  color: #d1d5db;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.prose-custom ul,
+.prose-custom ol {
+  color: #d1d5db;
+  margin-bottom: 1.25rem;
+  padding-left: 2rem;
+}
+
+.prose-custom li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.prose-custom ul li {
+  list-style-type: disc;
+}
+
+.prose-custom ol li {
+  list-style-type: decimal;
+}
+
+.prose-custom strong {
+  color: white;
+  font-weight: 600;
+}
+
+.prose-custom a {
+  color: #60a5fa;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-custom a:hover {
+  color: #93bbfd;
+}
+
+.prose-custom blockquote {
+  border-left: 3px solid #3b82f6;
+  padding-left: 1.25rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin: 1.5rem 0;
+  color: #9ca3af;
+  font-style: italic;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.prose-custom hr {
+  border: none;
+  border-top: 1px solid #374151;
+  margin: 2rem 0;
+}
+
+.prose-custom img {
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+}
+
+.prose-custom code {
+  background: #1f2937;
+  color: #a5b4fc;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+.prose-custom pre {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.prose-custom pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Animate-in for search results */
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-in {
+  animation: animate-in 0.4s ease-out both;
 }
