@@ -18,7 +18,7 @@ export default function CreaPage() {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [tags, setTags] = useState("");
   const [visibility, setVisibility] = useState<"PUBLIC" | "PROFILE_ONLY">(
     "PUBLIC"

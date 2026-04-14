@@ -14,8 +14,20 @@ export async function GET() {
     const creatorLimit =
       user.role === "CREATOR" ? checkCreatorLimit(user) : null;
 
+    type ArticleRow = {
+      id: string;
+      title: string;
+      slug: string;
+      category: string;
+      upvotes: number;
+      published: boolean;
+      isDraft: boolean;
+      visibility: string;
+      createdAt: Date;
+    };
+
     // Get articles based on role
-    let articles;
+    let articles: ArticleRow[] = [];
     if (user.role === "ADMIN") {
       articles = await prisma.article.findMany({
         select: {
