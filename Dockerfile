@@ -46,6 +46,13 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/src/generated ./src/generated
 
+# Copy node_modules needed for prisma db push at startup
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+
+# Copy startup script
+COPY --chown=nextjs:nodejs startup.sh ./startup.sh
+RUN chmod +x ./startup.sh
+
 USER nextjs
 
 EXPOSE 80
@@ -53,7 +60,7 @@ EXPOSE 80
 ENV PORT=80
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["sh", "startup.sh"]
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:80 || exit 1
