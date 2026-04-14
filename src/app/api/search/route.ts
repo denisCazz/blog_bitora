@@ -126,6 +126,7 @@ export async function POST(request: Request) {
             tags: JSON.stringify(generated.tags),
             readingTime: estimateReadingTime(generated.content),
             promoted: generated.promoted,
+            generatedByUserId: user.id,
           },
         });
         created.push(article);

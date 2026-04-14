@@ -144,10 +144,10 @@ export default function SearchBar() {
       <form onSubmit={handleSearch}>
         <div className="relative group">
           <div
-            className={`absolute -inset-0.5 bg-gradient-to-r from-blue-500/60 to-indigo-500/60 rounded-2xl blur-sm transition duration-500 ${
+            className={`absolute -inset-0.5 rounded-2xl blur-sm transition duration-500 ${
               loading
-                ? "opacity-100 animate-pulse"
-                : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                ? "opacity-100 bg-gradient-to-r from-sky-400/60 via-indigo-500/60 to-violet-500/60 animate-pulse"
+                : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 bg-gradient-to-r from-blue-500/60 to-indigo-500/60"
             }`}
           />
           <div className="relative flex items-center bg-gray-900 rounded-xl border border-gray-800 group-focus-within:border-gray-700 overflow-hidden transition-colors">
@@ -196,43 +196,131 @@ export default function SearchBar() {
         </p>
       )}
 
-      {/* Loading animation */}
+      {/* Loading — cosmic AI animation */}
       {loading && (
-        <div className="mt-8 space-y-4">
-          <div className="flex items-center justify-center gap-3 text-blue-400 text-sm font-medium">
-            <div className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
-            </div>
-            <span className="animate-pulse">{LOADING_STEPS[loadingStep]}</span>
-          </div>
-
-          {/* Skeleton cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[0, 1, 2].map((i) => (
+        <div className="mt-10 flex flex-col items-center gap-8">
+          {/* Cosmic orb */}
+          <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
+            {/* Outer glow */}
+            <div
+              className="absolute inset-0 rounded-full animate-ai-glow"
+              style={{ background: "radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)" }}
+            />
+            {/* Ring 1 */}
+            <div
+              className="absolute animate-ring"
+              style={{
+                width: 120, height: 120,
+                borderRadius: "50%",
+                border: "1.5px solid transparent",
+                backgroundImage: "linear-gradient(135deg, #38bdf8, #818cf8, transparent, transparent)",
+                backgroundOrigin: "border-box",
+                WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              }}
+            />
+            {/* Ring 2 */}
+            <div
+              className="absolute animate-ring-rev"
+              style={{
+                width: 100, height: 100,
+                borderRadius: "50%",
+                border: "1.5px solid transparent",
+                backgroundImage: "linear-gradient(45deg, #c084fc, #38bdf8, transparent, transparent)",
+                backgroundOrigin: "border-box",
+                WebkitMask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
+                WebkitMaskComposite: "destination-out",
+                maskComposite: "exclude",
+              }}
+            />
+            {/* Orbiting particles */}
+            {[
+              { delay: "0s", r: 52, color: "#38bdf8", size: 6 },
+              { delay: "1.2s", r: 52, color: "#c084fc", size: 5 },
+              { delay: "2.4s", r: 52, color: "#818cf8", size: 4 },
+            ].map((p, i) => (
               <div
                 key={i}
-                className="rounded-xl bg-gray-900/50 border border-gray-800/50 p-5 animate-pulse"
-                style={{ animationDelay: `${i * 200}ms` }}
-              >
-                <div className="h-3 w-16 bg-gray-800 rounded-full mb-4" />
-                <div className="h-4 w-full bg-gray-800 rounded mb-2" />
-                <div className="h-4 w-3/4 bg-gray-800 rounded mb-4" />
-                <div className="h-3 w-full bg-gray-800/50 rounded mb-1" />
-                <div className="h-3 w-2/3 bg-gray-800/50 rounded" />
-              </div>
+                className="absolute animate-orbit"
+                style={{
+                  width: p.size, height: p.size,
+                  borderRadius: "50%",
+                  background: p.color,
+                  boxShadow: `0 0 ${p.size * 2}px ${p.color}`,
+                  animationDelay: p.delay,
+                  "--orbit-r": `${p.r}px`,
+                } as React.CSSProperties}
+              />
             ))}
+            {/* Core */}
+            <div
+              className="relative z-10 rounded-full animate-ai-glow"
+              style={{
+                width: 56, height: 56,
+                background: "radial-gradient(circle at 35% 35%, #818cf8, #38bdf8 50%, #4f46e5)",
+                boxShadow: "0 0 24px rgba(129,140,248,0.7), 0 0 48px rgba(56,189,248,0.3)",
+              }}
+            >
+              {/* Inner sparkle */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z"
+                    fill="white" fillOpacity="0.9"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Step text */}
+          <div className="text-center space-y-2">
+            <p className="text-shimmer text-sm font-semibold tracking-wide">
+              {LOADING_STEPS[loadingStep]}
+            </p>
+            <p className="text-gray-600 text-xs">
+              Passo {loadingStep + 1} di {LOADING_STEPS.length}
+            </p>
           </div>
 
           {/* Progress dots */}
-          <div className="flex justify-center gap-1.5 pt-2">
+          <div className="flex gap-2">
             {LOADING_STEPS.map((_, i) => (
               <div
                 key={i}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  i <= loadingStep ? "w-6 bg-blue-500" : "w-1.5 bg-gray-700"
-                }`}
+                className="h-1 rounded-full transition-all duration-700"
+                style={{
+                  width: i === loadingStep ? 28 : 8,
+                  background: i < loadingStep
+                    ? "linear-gradient(90deg,#38bdf8,#818cf8)"
+                    : i === loadingStep
+                    ? "linear-gradient(90deg,#818cf8,#c084fc)"
+                    : "#374151",
+                  boxShadow: i === loadingStep ? "0 0 8px rgba(129,140,248,0.7)" : "none",
+                }}
               />
+            ))}
+          </div>
+
+          {/* Cosmic skeleton cards */}
+          <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="rounded-xl border p-5 animate-pulse"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.05), rgba(56,189,248,0.03))",
+                  borderColor: `rgba(${i === 0 ? "56,189,248" : i === 1 ? "129,140,248" : "192,132,252"},0.15)`,
+                  animationDelay: `${i * 250}ms`,
+                }}
+              >
+                <div className="h-2.5 w-16 rounded-full mb-4" style={{ background: "rgba(99,102,241,0.2)" }} />
+                <div className="h-3.5 w-full rounded mb-2" style={{ background: "rgba(129,140,248,0.1)" }} />
+                <div className="h-3.5 w-3/4 rounded mb-4" style={{ background: "rgba(129,140,248,0.1)" }} />
+                <div className="h-2.5 w-full rounded mb-1.5" style={{ background: "rgba(99,102,241,0.07)" }} />
+                <div className="h-2.5 w-2/3 rounded" style={{ background: "rgba(99,102,241,0.07)" }} />
+              </div>
             ))}
           </div>
         </div>
@@ -250,13 +338,14 @@ export default function SearchBar() {
         <div className="mt-8 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold text-lg">
-              {articles.length} articol{articles.length === 1 ? "o" : "i"} trovat{articles.length === 1 ? "o" : "i"}
+              <span className="text-shimmer">{articles.length}</span>{" "}
+              articol{articles.length === 1 ? "o" : "i"} generat{articles.length === 1 ? "o" : "i"}
             </h3>
             <button
               onClick={() => setArticles([])}
               className="text-gray-500 hover:text-white text-sm transition-colors"
             >
-              Chiudi risultati
+              Chiudi
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -264,8 +353,21 @@ export default function SearchBar() {
               <Link
                 key={article.id}
                 href={`/articolo/${article.slug}`}
-                className="group block rounded-xl bg-gray-900 border border-gray-800 hover:border-blue-500/50 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5 animate-in"
-                style={{ animationDelay: `${i * 150}ms` }}
+                className="group block rounded-xl border p-5 transition-all duration-300"
+                style={{
+                  background: "linear-gradient(135deg, rgba(15,15,30,0.9), rgba(20,20,40,0.9))",
+                  borderColor: "rgba(99,102,241,0.2)",
+                  boxShadow: "0 0 0 0 rgba(99,102,241,0)",
+                  animationDelay: `${i * 150}ms`,
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(129,140,248,0.5)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(99,102,241,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.2)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 0 rgba(99,102,241,0)";
+                }}
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span
@@ -274,16 +376,16 @@ export default function SearchBar() {
                     {getCategoryEmoji(article.category)} {article.category}
                   </span>
                 </div>
-                <h4 className="text-white font-semibold text-sm mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">
+                <h4 className="text-white font-semibold text-sm mb-2 group-hover:text-indigo-300 transition-colors line-clamp-2">
                   {article.title}
                 </h4>
                 <p className="text-gray-400 text-xs line-clamp-3 mb-3">
                   {article.summary}
                 </p>
-                <div className="flex items-center justify-between pt-3 border-t border-gray-800">
+                <div className="flex items-center justify-between pt-3 border-t border-gray-800/60">
                   <div className="flex gap-1.5">
                     {parseTags(article.tags).slice(0, 2).map((tag) => (
-                      <span key={tag} className="text-[10px] text-gray-500 bg-gray-800 px-1.5 py-0.5 rounded">
+                      <span key={tag} className="text-[10px] text-indigo-400/60 bg-indigo-500/10 px-1.5 py-0.5 rounded">
                         #{tag}
                       </span>
                     ))}

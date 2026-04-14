@@ -64,8 +64,25 @@ export async function GET() {
       articles = [];
     }
 
+    // AI-generated articles for all users
+    const aiArticles = await prisma.article.findMany({
+      where: { generatedByUserId: user.id },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        category: true,
+        upvotes: true,
+        readingTime: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    });
+
     return NextResponse.json({
       articles,
+      aiArticles,
       aiLimit: { remaining: aiLimit.remaining, limit: aiLimit.limit },
       creatorLimit: creatorLimit
         ? { remaining: creatorLimit.remaining, limit: creatorLimit.limit }

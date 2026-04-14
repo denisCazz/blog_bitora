@@ -39,10 +39,21 @@ interface LimitInfo {
   limit: number;
 }
 
+interface AIArticle {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  upvotes: number;
+  readingTime: number;
+  createdAt: string;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [aiArticles, setAiArticles] = useState<AIArticle[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [aiLimit, setAiLimit] = useState<LimitInfo | null>(null);
   const [creatorLimit, setCreatorLimit] = useState<LimitInfo | null>(null);
@@ -69,6 +80,7 @@ export default function DashboardPage() {
         if (dashRes.ok) {
           const dashData = await dashRes.json();
           setArticles(dashData.articles || []);
+          setAiArticles(dashData.aiArticles || []);
           setAiLimit(dashData.aiLimit || null);
           setCreatorLimit(dashData.creatorLimit || null);
         }
@@ -336,7 +348,7 @@ export default function DashboardPage() {
       )}
 
       {/* Reader view */}
-      {!isCreator && !isAdmin && (
+      {!isCreator && !isAdmin && aiArticles.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-400 mb-4">
             Usa la barra di ricerca nella home per generare articoli personalizzati con l&apos;AI
@@ -347,6 +359,57 @@ export default function DashboardPage() {
           >
             Vai alla Home
           </Link>
+        </div>
+      )}
+
+      {/* AI-generated articles (all users) */}
+      {aiArticles.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #818cf8, #38bdf8)" }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-white">Le tue generazioni AI</h2>
+            <span className="text-xs text-gray-600 ml-1">({aiArticles.length})</span>
+          </div>
+          <div className="space-y-2">
+            {aiArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/articolo/${article.slug}`}
+                className="flex items-center justify-between rounded-xl border px-5 py-3 transition-all group"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.05), rgba(56,189,248,0.03))",
+                  borderColor: "rgba(99,102,241,0.15)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.35)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 12px rgba(99,102,241,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.15)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
+              >
+                <div className="flex-1 min-w-0 mr-4">
+                  <span className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate block">
+                    {article.title}
+                  </span>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-gray-500">{article.category}</span>
+                    {article.upvotes > 0 && (
+                      <span className="text-xs text-sky-500">↑ {article.upvotes}</span>
+                    )}
+                    <span className="text-xs text-gray-600">{article.readingTime} min</span>
+                  </div>
+                </div>
+                <span className="text-xs text-indigo-400/70 shrink-0">Leggi →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

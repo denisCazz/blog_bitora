@@ -49,27 +49,84 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-12 sm:py-20 md:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-gray-950 to-gray-950" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-3xl" />
+      {/* Hero Section — deep space */}
+      <section className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
+        {/* Starfield */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(60)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full animate-star"
+              style={{
+                width: i % 5 === 0 ? 2 : 1,
+                height: i % 5 === 0 ? 2 : 1,
+                background: i % 3 === 0 ? "#818cf8" : i % 3 === 1 ? "#38bdf8" : "#ffffff",
+                left: `${(i * 73 + 11) % 100}%`,
+                top: `${(i * 47 + 23) % 100}%`,
+                animationDelay: `${(i * 0.3) % 4}s`,
+                animationDuration: `${2 + (i % 3)}s`,
+                opacity: 0.3 + (i % 4) * 0.15,
+              }}
+            />
+          ))}
+        </div>
+        {/* Nebula blobs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute animate-nebula"
+            style={{
+              top: "-20%", left: "10%",
+              width: 600, height: 600,
+              background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
+              filter: "blur(60px)",
+            }}
+          />
+          <div
+            className="absolute animate-nebula"
+            style={{
+              top: "30%", right: "-5%",
+              width: 500, height: 500,
+              background: "radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)",
+              filter: "blur(60px)",
+              animationDelay: "4s",
+            }}
+          />
+          <div
+            className="absolute animate-nebula"
+            style={{
+              bottom: "-10%", left: "40%",
+              width: 400, height: 400,
+              background: "radial-gradient(circle, rgba(192,132,252,0.1) 0%, transparent 70%)",
+              filter: "blur(60px)",
+              animationDelay: "8s",
+            }}
+          />
+        </div>
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/80 via-gray-950 to-gray-950" />
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium tracking-wide uppercase mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-medium tracking-wide uppercase mb-8"
+            style={{
+              background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(56,189,248,0.05))",
+              borderColor: "rgba(99,102,241,0.3)",
+              color: "#a5b4fc",
+            }}
+          >
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-400"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-400" />
             </span>
             Powered by AI · Fonti verificate
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
-            Notizie tech,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
+            Notizie{" "}
+            <span className="text-shimmer">
               generate dall&apos;AI
             </span>
           </h1>
           <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Cerca qualsiasi argomento tech e l&apos;intelligenza artificiale
-            scriverà un articolo approfondito con fonti autorevoli, in tempo reale.
+            Cerca qualsiasi argomento e l&apos;intelligenza artificiale scriverà articoli approfonditi con fonti autorevoli, in tempo reale.
           </p>
           <SearchBar />
         </div>
@@ -95,7 +152,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 : "Il blog è ancora vuoto. Usa la barra di ricerca per generare il primo articolo!"}
             </p>
             <p className="text-gray-500 text-sm">
-              Prova a cercare un argomento tech nella barra di ricerca sopra
+              Prova a cercare un argomento nella barra di ricerca sopra
             </p>
           </div>
         ) : (
@@ -125,39 +182,108 @@ export default async function Home({ searchParams }: HomeProps) {
             )}
 
             {/* Article Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {(category || page > 1 ? articles : rest).map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
             </div>
 
-            {/* Pagination */}
-            {pages > 1 && (
-              <div className="flex justify-center gap-2 mt-12">
-                {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
+            {/* Pagination — modern */}
+            {pages > 1 && (() => {
+              const delta = 2;
+              const range: number[] = [];
+              for (let i = Math.max(1, page - delta); i <= Math.min(pages, page + delta); i++) {
+                range.push(i);
+              }
+              const showFirst = range[0] > 1;
+              const showLast = range[range.length - 1] < pages;
+              const catStr = category ? `&category=${encodeURIComponent(category)}` : "";
+              return (
+                <nav className="flex items-center justify-center gap-1.5 mt-14" aria-label="Paginazione">
+                  {/* Prev */}
                   <a
-                    key={p}
-                    href={`/?page=${p}${category ? `&category=${encodeURIComponent(category)}` : ""}`}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      p === page
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
+                    href={page > 1 ? `/?page=${page - 1}${catStr}` : undefined}
+                    aria-disabled={page === 1}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      page === 1
+                        ? "text-gray-700 cursor-not-allowed pointer-events-none"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800 border border-gray-800 hover:border-gray-700"
                     }`}
                   >
-                    {p}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Precedente
                   </a>
-                ))}
-              </div>
-            )}
+
+                  {/* First + ellipsis */}
+                  {showFirst && (
+                    <>
+                      <a href={`/?page=1${catStr}`} className="px-3.5 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 border border-gray-800 hover:border-gray-700 transition-all">1</a>
+                      {range[0] > 2 && <span className="px-1 text-gray-700">···</span>}
+                    </>
+                  )}
+
+                  {/* Page numbers */}
+                  {range.map((p) => (
+                    <a
+                      key={p}
+                      href={`/?page=${p}${catStr}`}
+                      className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
+                        p === page
+                          ? "text-white border border-indigo-500/50"
+                          : "text-gray-400 hover:text-white hover:bg-gray-800 border border-gray-800 hover:border-gray-700"
+                      }`}
+                      style={p === page ? {
+                        background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(56,189,248,0.1))",
+                        boxShadow: "0 0 12px rgba(99,102,241,0.3)",
+                      } : {}}
+                    >
+                      {p}
+                    </a>
+                  ))}
+
+                  {/* Last + ellipsis */}
+                  {showLast && (
+                    <>
+                      {range[range.length - 1] < pages - 1 && <span className="px-1 text-gray-700">···</span>}
+                      <a href={`/?page=${pages}${catStr}`} className="px-3.5 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 border border-gray-800 hover:border-gray-700 transition-all">{pages}</a>
+                    </>
+                  )}
+
+                  {/* Next */}
+                  <a
+                    href={page < pages ? `/?page=${page + 1}${catStr}` : undefined}
+                    aria-disabled={page === pages}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      page === pages
+                        ? "text-gray-700 cursor-not-allowed pointer-events-none"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800 border border-gray-800 hover:border-gray-700"
+                    }`}
+                  >
+                    Successiva
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </nav>
+              );
+            })()}
           </>
         )}
       </section>
 
       {/* Bitora CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-px">
-          <div className="relative rounded-2xl bg-gray-950/40 backdrop-blur-sm p-8 md:p-12">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+        <div className="relative overflow-hidden rounded-2xl p-px"
+          style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.7), rgba(56,189,248,0.5), rgba(192,132,252,0.5))" }}
+        >
+          <div className="relative rounded-2xl bg-gray-950/90 backdrop-blur-sm p-8 md:p-12">
+            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+              <div className="absolute -top-10 -right-10 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl" />
+            </div>
+            <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
               <div className="max-w-xl">
                 <div className="flex items-center gap-2 mb-3">
                   <Image
@@ -168,14 +294,14 @@ export default async function Home({ searchParams }: HomeProps) {
                     className="rounded-md"
                     unoptimized
                   />
-                  <span className="text-blue-300 text-sm font-medium">bitora.it</span>
+                  <span className="text-indigo-300 text-sm font-medium">bitora.it</span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                   Hai bisogno di soluzioni tech su misura?
                 </h2>
-                <p className="text-blue-100/80 text-base leading-relaxed">
-                  Bitora è un&apos;azienda italiana specializzata in sviluppo software, 
-                  consulenza IT, soluzioni cloud e automazione digitale. 
+                <p className="text-blue-100/70 text-base leading-relaxed">
+                  Bitora è un&apos;azienda italiana specializzata in sviluppo software,
+                  consulenza IT, soluzioni cloud e automazione digitale.
                   Dalla progettazione al deployment, trasformiamo le tue idee in prodotti digitali.
                 </p>
               </div>

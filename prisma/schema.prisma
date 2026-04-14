@@ -77,13 +77,14 @@ model Article {
   promoted    Boolean           @default(false)
   published   Boolean           @default(true)
   isDraft     Boolean           @default(false)
-  status      ArticleStatus     @default(PUBLISHED)
-  externalUrl String?           @db.VarChar(1000)
-  visibility  ArticleVisibility @default(PUBLIC)
-  authorId    String?
-  author      User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  status             ArticleStatus     @default(PUBLISHED)
+  externalUrl        String?           @db.VarChar(1000)
+  visibility         ArticleVisibility @default(PUBLIC)
+  authorId           String?
+  author             User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  generatedByUserId  String?           @db.VarChar(255)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   comments Comment[]
   votes    Vote[]
@@ -92,6 +93,7 @@ model Article {
   @@index([createdAt])
   @@index([upvotes])
   @@index([authorId])
+  @@index([generatedByUserId])
 }
 
 model Comment {
