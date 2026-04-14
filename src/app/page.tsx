@@ -50,60 +50,71 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div className="min-h-screen">
       {/* Hero Section — deep space */}
-      <section className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-        {/* Starfield */}
+      <section className="relative py-20 sm:py-28 md:py-40 overflow-hidden">
+
+        {/* Dense starfield — 150 stars */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(60)].map((_, i) => (
+          {[...Array(150)].map((_, i) => {
+            const size = i % 20 === 0 ? 3 : i % 7 === 0 ? 2 : i % 3 === 0 ? 1.5 : 1;
+            const color = i % 5 === 0 ? "#c084fc" : i % 4 === 0 ? "#38bdf8" : i % 3 === 0 ? "#818cf8" : i % 7 === 0 ? "#f0abfc" : "#ffffff";
+            return (
+              <div
+                key={i}
+                className="absolute rounded-full animate-star"
+                style={{
+                  width: size,
+                  height: size,
+                  background: color,
+                  boxShadow: size >= 2 ? `0 0 ${size * 3}px ${color}` : undefined,
+                  left: `${(i * 67 + 13) % 100}%`,
+                  top: `${(i * 41 + 7) % 100}%`,
+                  animationDelay: `${(i * 0.19) % 5}s`,
+                  animationDuration: `${1.8 + (i % 5) * 0.6}s`,
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* Shooting stars */}
+        {[
+          { top: "8%",  left: "75%", delay: "0s",   dur: "2.2s" },
+          { top: "22%", left: "55%", delay: "4s",   dur: "2.6s" },
+          { top: "5%",  left: "35%", delay: "8.5s", dur: "2s"   },
+          { top: "40%", left: "82%", delay: "13s",  dur: "2.4s" },
+        ].map((s, i) => (
+          <div
+            key={i}
+            className="absolute pointer-events-none"
+            style={{ top: s.top, left: s.left, animationDelay: s.delay }}
+          >
             <div
-              key={i}
-              className="absolute rounded-full animate-star"
+              className="animate-shoot"
               style={{
-                width: i % 5 === 0 ? 2 : 1,
-                height: i % 5 === 0 ? 2 : 1,
-                background: i % 3 === 0 ? "#818cf8" : i % 3 === 1 ? "#38bdf8" : "#ffffff",
-                left: `${(i * 73 + 11) % 100}%`,
-                top: `${(i * 47 + 23) % 100}%`,
-                animationDelay: `${(i * 0.3) % 4}s`,
-                animationDuration: `${2 + (i % 3)}s`,
-                opacity: 0.3 + (i % 4) * 0.15,
+                height: "1.5px",
+                width: 140,
+                animationDuration: s.dur,
+                animationDelay: s.delay,
+                animationIterationCount: "infinite",
+                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), rgba(196,181,253,0.6), transparent)",
+                borderRadius: 2,
               }}
             />
-          ))}
-        </div>
-        {/* Nebula blobs */}
+          </div>
+        ))}
+
+        {/* Nebula blobs — stronger opacity */}
         <div className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute animate-nebula"
-            style={{
-              top: "-20%", left: "10%",
-              width: 600, height: 600,
-              background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
-          />
-          <div
-            className="absolute animate-nebula"
-            style={{
-              top: "30%", right: "-5%",
-              width: 500, height: 500,
-              background: "radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%)",
-              filter: "blur(60px)",
-              animationDelay: "4s",
-            }}
-          />
-          <div
-            className="absolute animate-nebula"
-            style={{
-              bottom: "-10%", left: "40%",
-              width: 400, height: 400,
-              background: "radial-gradient(circle, rgba(192,132,252,0.1) 0%, transparent 70%)",
-              filter: "blur(60px)",
-              animationDelay: "8s",
-            }}
-          />
+          <div className="absolute animate-nebula" style={{ top: "-15%", left: "5%",   width: 700, height: 700, background: "radial-gradient(circle, rgba(99,102,241,0.28) 0%, transparent 65%)",  filter: "blur(70px)" }} />
+          <div className="absolute animate-nebula" style={{ top: "20%",  right: "-8%", width: 600, height: 600, background: "radial-gradient(circle, rgba(56,189,248,0.20) 0%, transparent 65%)",  filter: "blur(65px)", animationDelay: "5s" }} />
+          <div className="absolute animate-nebula" style={{ bottom: "-5%",left: "35%", width: 550, height: 550, background: "radial-gradient(circle, rgba(192,132,252,0.22) 0%, transparent 65%)", filter: "blur(65px)", animationDelay: "10s" }} />
+          <div className="absolute animate-nebula" style={{ top: "50%",  left: "20%", width: 350, height: 350, background: "radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 65%)",  filter: "blur(50px)", animationDelay: "2s" }} />
         </div>
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/80 via-gray-950 to-gray-950" />
+
+        {/* Subtle vignette so text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#03050e]/30 to-[#03050e]/70 pointer-events-none" />
+        {/* Bottom horizon glow */}
+        <div className="absolute bottom-0 inset-x-0 h-32 hero-horizon pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-medium tracking-wide uppercase mb-8"
@@ -294,7 +305,7 @@ export default async function Home({ searchParams }: HomeProps) {
                     className="rounded-md"
                     unoptimized
                   />
-                  <span className="text-indigo-300 text-sm font-medium">bitora.it</span>
+                  <span className="text-indigo-300 text-sm font-medium">Bitora.it</span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                   Hai bisogno di soluzioni tech su misura?
@@ -311,7 +322,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 rel="noopener noreferrer"
                 className="px-8 py-3.5 bg-white text-gray-900 font-semibold rounded-xl hover:bg-blue-50 transition-colors whitespace-nowrap shadow-lg shadow-black/20"
               >
-                Scopri bitora.it →
+                Scopri Bitora.it →
               </a>
             </div>
           </div>

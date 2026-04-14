@@ -28,19 +28,9 @@ export default function ArticleCard({
   if (featured) {
     return (
       <Link href={`/articolo/${article.slug}`} className="group block">
-        <article className="relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-2xl"
+        <article className="article-card-featured relative overflow-hidden rounded-2xl border transition-all duration-300"
           style={{
             background: "linear-gradient(135deg, rgba(15,15,35,0.95), rgba(20,20,45,0.9))",
-            borderColor: "rgba(99,102,241,0.2)",
-            boxShadow: "0 0 0 0 transparent",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(129,140,248,0.4)";
-            (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 40px rgba(99,102,241,0.15)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.2)";
-            (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 0 transparent";
           }}
         >
           {/* Nebula glow top right */}
@@ -91,19 +81,10 @@ export default function ArticleCard({
   return (
     <Link href={`/articolo/${article.slug}`} className="group block">
       <article
-        className="h-full rounded-xl border transition-all duration-300 overflow-hidden flex flex-col"
+        className="article-card h-full rounded-xl border transition-all duration-300 overflow-hidden flex flex-col"
         style={{
           background: "linear-gradient(145deg, rgba(13,13,28,0.95), rgba(18,18,35,0.9))",
-          borderColor: "rgba(55,65,81,0.6)",
           backdropFilter: "blur(8px)",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.4)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 24px rgba(99,102,241,0.1)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.borderColor = "rgba(55,65,81,0.6)";
-          (e.currentTarget as HTMLElement).style.boxShadow = "none";
         }}
       >
         <div className="p-6 flex flex-col flex-1">

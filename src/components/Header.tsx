@@ -71,7 +71,7 @@ export default function Header() {
               rel="noopener noreferrer"
               className="px-3 py-1.5 text-sm text-blue-400 hover:text-white bg-blue-500/10 hover:bg-blue-500/20 rounded-lg border border-blue-500/20 transition-all"
             >
-              bitora.it ↗
+              Bitora.it ↗
             </a>
 
             {user ? (
@@ -195,7 +195,7 @@ export default function Header() {
               rel="noopener noreferrer"
               className="block px-3 py-2.5 text-sm text-blue-400 hover:text-blue-300 rounded-lg hover:bg-white/5"
             >
-              bitora.it ↗
+              Bitora.it ↗
             </a>
             <div className="border-t border-gray-800/60 my-2" />
             {user ? (

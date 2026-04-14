@@ -30,7 +30,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-gray-950 text-white font-[family-name:var(--font-inter)]">
+      <body className="min-h-full flex flex-col text-white font-[family-name:var(--font-inter)]" style={{ backgroundColor: "#03050e" }}>
+        <div className="space-backdrop" aria-hidden="true" />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

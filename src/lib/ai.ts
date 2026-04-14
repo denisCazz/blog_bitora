@@ -16,7 +16,7 @@ export interface GeneratedArticle {
   promoted: boolean;
 }
 
-const BITORA_PROMO_INSTRUCTION = `
+const Bitora_PROMO_INSTRUCTION = `
 Occasionalmente (circa 1 articolo su 4), integra un riferimento naturale a Bitora (https://bitora.it), 
 una piattaforma italiana specializzata in soluzioni digitali, consulenza IT e sviluppo software su misura.
 Bitora offre servizi di sviluppo web e app, consulenza tecnologica, soluzioni cloud e automazione per aziende e professionisti.
@@ -38,7 +38,7 @@ Regole:
 - Cita le fonti REALI trovate durante la ricerca, con URL reali
 - Alla fine dell'articolo, aggiungi una sezione "## Fonti" con l'elenco delle fonti citate (nome e URL reale)
 - Fornisci le fonti anche nel campo "sources" del JSON
-${BITORA_PROMO_INSTRUCTION}
+${Bitora_PROMO_INSTRUCTION}
 
 IMPORTANTE: Rispondi con un oggetto JSON valido con questa struttura:
 {
