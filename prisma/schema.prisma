@@ -19,6 +19,12 @@ enum ArticleVisibility {
   PROFILE_ONLY
 }
 
+enum ArticleStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+}
+
 model User {
   id                       String   @id @default(cuid())
   email                    String   @unique @db.VarChar(255)
@@ -71,6 +77,8 @@ model Article {
   promoted    Boolean           @default(false)
   published   Boolean           @default(true)
   isDraft     Boolean           @default(false)
+  status      ArticleStatus     @default(PUBLISHED)
+  externalUrl String?           @db.VarChar(1000)
   visibility  ArticleVisibility @default(PUBLIC)
   authorId    String?
   author      User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)

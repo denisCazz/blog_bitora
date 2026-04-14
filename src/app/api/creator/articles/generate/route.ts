@@ -2,11 +2,17 @@ import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { generateArticle } from "@/lib/ai";
 
+const BLOCKED_KEYWORDS = [
+  "bomba", "esplosivo", "arma", "droga", "stupefacente", "hacking", "malware",
+  "terrorism", "terrorismo", "suicidio", "autolesionismo", "pedofilia",
+];
+
 export async function POST(request: Request) {
   try {
     await requireRole(["CREATOR", "ADMIN"]);
 
-    const { topic } = await request.json();
+    const body = await request.json();
+    const { topic, target, tone, keywords } = body;
 
     if (!topic || typeof topic !== "string" || topic.trim().length < 3) {
       return NextResponse.json(
@@ -15,7 +21,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const article = await generateArticle(topic.trim());
+    const fullText = [topic, keywords].filter(Boolean).join(" ").toLowerCase();
+    const blocked = BLOCKED_KEYWORDS.find((kw) => fullText.includes(kw));
+    if (blocked) {
+      return NextResponse.json(
+        { error: "L'argomento non è consentito su questa piattaforma." },
+        { status: 400 }
+      );
+    }
+
+    const article = await generateArticle(topic.trim(), {
+      target: typeof target === "string" ? target : undefined,
+      tone: typeof tone === "string" ? tone : undefined,
+      keywords: typeof keywords === "string" ? keywords : undefined,
+    });
 
     return NextResponse.json({ article });
   } catch (error) {

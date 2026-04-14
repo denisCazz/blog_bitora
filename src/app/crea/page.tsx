@@ -10,6 +10,9 @@ export default function CreaPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("topic");
   const [topic, setTopic] = useState("");
+  const [target, setTarget] = useState("pubblico generale");
+  const [tone, setTone] = useState("informale");
+  const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState(false);
@@ -23,6 +26,7 @@ export default function CreaPage() {
   const [visibility, setVisibility] = useState<"PUBLIC" | "PROFILE_ONLY">(
     "PUBLIC"
   );
+  const [externalUrl, setExternalUrl] = useState("");
 
   // Auth check
   useEffect(() => {
@@ -52,7 +56,12 @@ export default function CreaPage() {
       const res = await fetch("/api/creator/articles/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: topic.trim() }),
+        body: JSON.stringify({
+          topic: topic.trim(),
+          target,
+          tone,
+          keywords: keywords.trim() || undefined,
+        }),
       });
 
       const data = await res.json();
@@ -95,6 +104,7 @@ export default function CreaPage() {
           tags,
           visibility,
           isDraft,
+          externalUrl: externalUrl.trim() || undefined,
         }),
       });
 
@@ -131,7 +141,7 @@ export default function CreaPage() {
         >
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1.5">
-              Argomento
+              Argomento *
             </label>
             <input
               type="text"
@@ -140,6 +150,53 @@ export default function CreaPage() {
               placeholder="Es: I nuovi modelli AI di Google nel 2026"
               className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 transition-colors"
               autoFocus
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Pubblico target
+              </label>
+              <select
+                value={target}
+                onChange={(e) => setTarget(e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors"
+              >
+                <option value="pubblico generale">Pubblico generale</option>
+                <option value="professionisti del settore">Professionisti del settore</option>
+                <option value="studenti">Studenti</option>
+                <option value="imprenditori e manager">Imprenditori e manager</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+                Tono
+              </label>
+              <select
+                value={tone}
+                onChange={(e) => setTone(e.target.value)}
+                className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors"
+              >
+                <option value="informale">Informale</option>
+                <option value="formale">Formale</option>
+                <option value="divulgativo">Divulgativo</option>
+                <option value="tecnico">Tecnico</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              Parole chiave <span className="text-gray-500">(opzionale)</span>
+            </label>
+            <input
+              type="text"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              placeholder="Es: innovazione, sostenibilità, futuro"
+              className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 transition-colors"
             />
           </div>
 
@@ -300,6 +357,22 @@ export default function CreaPage() {
               onChange={(e) => setTags(e.target.value)}
               className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500/50 transition-colors"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              URL articolo originale <span className="text-gray-500">(opzionale — se l&apos;articolo è ospitato altrove)</span>
+            </label>
+            <input
+              type="url"
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+              placeholder="https://tuosito.it/articolo"
+              className="w-full bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 transition-colors"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Se specificato, verrà mostrata solo l&apos;anteprima con link all&apos;articolo completo.
+            </p>
           </div>
 
           <div className="flex items-center gap-3 pt-4">

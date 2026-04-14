@@ -24,45 +24,48 @@ export function formatDate(date: Date | string): string {
 }
 
 export const CATEGORIES = [
-  "AI",
-  "Cybersecurity",
-  "Mobile",
-  "Cloud",
-  "Startup",
-  "Hardware",
-  "Software",
-  "Web3",
-  "Green Tech",
+  "Tecnologia",
+  "Scienza",
+  "Economia",
+  "Politica",
+  "Cultura",
+  "Sport",
+  "Salute",
+  "Ambiente",
+  "Intrattenimento",
+  "Lifestyle",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
 
 export function getCategoryColor(category: string): string {
   const colors: Record<string, string> = {
-    AI: "bg-purple-500",
-    Cybersecurity: "bg-red-500",
-    Mobile: "bg-blue-500",
-    Cloud: "bg-cyan-500",
-    Startup: "bg-green-500",
-    Hardware: "bg-orange-500",
-    Software: "bg-indigo-500",
-    Web3: "bg-yellow-500",
-    "Green Tech": "bg-emerald-500",
+    Tecnologia: "bg-blue-500",
+    Scienza: "bg-cyan-500",
+    Economia: "bg-green-500",
+    Politica: "bg-red-500",
+    Cultura: "bg-purple-500",
+    Sport: "bg-orange-500",
+    Salute: "bg-rose-500",
+    Ambiente: "bg-emerald-500",
+    Intrattenimento: "bg-yellow-500",
+    Lifestyle: "bg-pink-500",
   };
   return colors[category] || "bg-gray-500";
 }
 
 export function getCategoryEmoji(category: string): string {
   const emojis: Record<string, string> = {
-    AI: "🤖",
-    Cybersecurity: "🔒",
-    Mobile: "📱",
-    Cloud: "☁️",
-    Startup: "🚀",
-    Hardware: "🔧",
-    Software: "💻",
-    Web3: "🌐",
-    "Green Tech": "🌱",
+    Tecnologia: "💻",
+    Scienza: "🔬",
+    Economia: "📈",
+    Politica: "🏛️",
+    Cultura: "🎭",
+    Sport: "⚽",
+    Salute: "🏥",
+    Ambiente: "🌿",
+    Intrattenimento: "🎬",
+    Lifestyle: "✨",
   };
   return emojis[category] || "📰";
 }

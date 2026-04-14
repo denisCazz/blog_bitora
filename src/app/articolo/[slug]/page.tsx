@@ -63,6 +63,7 @@ export async function generateMetadata({
   return {
     title: `${article.title} | Blog Bitora`,
     description: article.summary,
+    ...(article.externalUrl ? { alternates: { canonical: article.externalUrl } } : {}),
     openGraph: {
       title: article.title,
       description: article.summary,
@@ -200,14 +201,32 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
       {/* Article Content */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="bg-gray-900/30 rounded-2xl border border-gray-800/60 p-5 sm:p-8 md:p-12">
-          <div
-            className="prose-custom"
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
-          />
-        </div>
+        {article.externalUrl ? (
+          <div className="bg-gray-900/30 rounded-2xl border border-gray-800/60 p-5 sm:p-8 md:p-12">
+            <p className="text-gray-300 text-base leading-relaxed mb-8">{article.summary}</p>
+            <a
+              href={article.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-xl transition-colors"
+            >
+              Leggi l&apos;articolo completo →
+            </a>
+            <p className="text-xs text-gray-600 mt-4">
+              Questo contenuto è ospitato su un sito esterno. Il link ti porterà alla fonte originale.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-gray-900/30 rounded-2xl border border-gray-800/60 p-5 sm:p-8 md:p-12">
+            <div
+              className="prose-custom"
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
+            />
+          </div>
+        )}
 
-        {/* AI Disclaimer */}
+        {/* AI Disclaimer — only for AI-generated articles without external URL */}
+        {!article.externalUrl && !article.authorId && (
         <div className="mt-8 p-4 rounded-xl bg-gray-800/50 border border-gray-700/50 text-sm text-gray-400 flex items-start gap-3">
           <span className="text-lg leading-none mt-0.5">ℹ️</span>
           <div>
@@ -216,6 +235,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             Le informazioni sono verificate per accuratezza ma consigliamo sempre di consultare le fonti originali.
           </div>
         </div>
+        )}
 
         {/* Vote + Share + Edit */}
         <div className="mt-8 flex flex-wrap items-center gap-4">

@@ -23,6 +23,7 @@ export async function GET(request: Request) {
   const where = {
     published: true,
     isDraft: false,
+    status: "PUBLISHED" as const,
     visibility: "PUBLIC" as const,
     ...(category ? { category } : {}),
   };

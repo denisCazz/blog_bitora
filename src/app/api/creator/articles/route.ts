@@ -22,6 +22,7 @@ export async function GET() {
         upvotes: true,
         published: true,
         isDraft: true,
+        status: true,
         visibility: true,
         createdAt: true,
       },
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, summary, content, category, tags, visibility, isDraft } =
+    const { title, summary, content, category, tags, visibility, isDraft, externalUrl } =
       body;
 
     if (!title || typeof title !== "string" || title.trim().length < 3) {
@@ -95,12 +96,14 @@ export async function POST(request: Request) {
         slug,
         summary: (summary || "").trim().slice(0, 2000),
         content: content.trim(),
-        category: category || "Software",
+        category: category || "Tecnologia",
         tags: tagsStr,
         readingTime: estimateReadingTime(content),
         visibility: visibility === "PROFILE_ONLY" ? "PROFILE_ONLY" : "PUBLIC",
         isDraft: isDraft === true,
         published: isDraft !== true,
+        status: isDraft === true ? "DRAFT" : "PENDING_REVIEW",
+        externalUrl: typeof externalUrl === "string" && externalUrl.trim() ? externalUrl.trim().slice(0, 1000) : null,
         authorId: user.id,
       },
     });

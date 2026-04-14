@@ -21,6 +21,7 @@ interface Article {
   upvotes: number;
   published: boolean;
   isDraft: boolean;
+  status: string;
   visibility: string;
   createdAt: string;
 }
@@ -99,6 +100,28 @@ export default function DashboardPage() {
 
   const isCreator = user.role === "CREATOR";
   const isAdmin = user.role === "ADMIN";
+
+  const approveArticle = async (id: string, action: "approve" | "reject") => {
+    const res = await fetch(`/api/admin/articles/${id}/approve`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    if (res.ok) {
+      setArticles((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? {
+                ...a,
+                status: action === "approve" ? "PUBLISHED" : "DRAFT",
+                published: action === "approve",
+                isDraft: action === "reject",
+              }
+            : a
+        )
+      );
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -228,7 +251,12 @@ export default function DashboardPage() {
                     <span className="text-xs text-gray-600">
                       ↑ {article.upvotes}
                     </span>
-                    {article.isDraft && (
+                    {article.status === "PENDING_REVIEW" && (
+                      <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
+                        In revisione
+                      </span>
+                    )}
+                    {article.status === "DRAFT" && (
                       <span className="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">
                         Bozza
                       </span>
@@ -240,12 +268,30 @@ export default function DashboardPage() {
                     )}
                   </div>
                 </div>
-                <Link
-                  href={`/articolo/${article.slug}/edit`}
-                  className="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
-                >
-                  Modifica
-                </Link>
+                <div className="flex items-center gap-2">
+                  {isAdmin && article.status === "PENDING_REVIEW" && (
+                    <>
+                      <button
+                        onClick={() => approveArticle(article.id, "approve")}
+                        className="text-xs text-green-400 hover:text-green-300 px-3 py-1.5 rounded-lg hover:bg-green-500/10 transition-colors"
+                      >
+                        Approva
+                      </button>
+                      <button
+                        onClick={() => approveArticle(article.id, "reject")}
+                        className="text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                      >
+                        Rifiuta
+                      </button>
+                    </>
+                  )}
+                  <Link
+                    href={`/articolo/${article.slug}/edit`}
+                    className="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  >
+                    Modifica
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

@@ -24,7 +24,7 @@ Il riferimento deve essere contestuale e naturale, mai forzato.
 Quando includi un riferimento a Bitora, segna promoted: true nel JSON.
 `;
 
-const ARTICLE_INSTRUCTIONS = `Sei un giornalista tech esperto italiano. Scrivi articoli per blog Bitora (blog.bitora.it), un blog tecnologico italiano.
+const ARTICLE_INSTRUCTIONS = `Sei un giornalista esperto italiano. Scrivi articoli per blog Bitora (blog.bitora.it), un blog italiano di informazione su vari argomenti.
 
 IMPORTANTE: Usa il tool web_search per cercare informazioni REALI e AGGIORNATE sull'argomento PRIMA di scrivere. 
 Fai ALMENO 2-3 ricerche web per raccogliere dati, statistiche, notizie recenti e fonti autorevoli.
@@ -45,7 +45,7 @@ IMPORTANTE: Rispondi con un oggetto JSON valido con questa struttura:
   "title": "titolo accattivante",
   "summary": "riassunto di 2-3 frasi",
   "content": "articolo completo in markdown con sezione Fonti alla fine",
-  "category": "una tra: AI, Cybersecurity, Mobile, Cloud, Startup, Hardware, Software, Web3, Green Tech",
+  "category": "una tra: Tecnologia, Scienza, Economia, Politica, Cultura, Sport, Salute, Ambiente, Intrattenimento, Lifestyle",
   "tags": ["tag1", "tag2", "tag3"],
   "sources": [{"name": "Nome Fonte", "url": "https://url-reale..."}, ...],
   "promoted": false
@@ -82,14 +82,26 @@ function parseArticleJSON(text: string): GeneratedArticle {
   }
 }
 
-export async function generateArticle(topic: string): Promise<GeneratedArticle> {
-  console.log(`[AI] generateArticle: START topic="${topic}"`);
+export interface GuidedArticleOptions {
+  target?: string;
+  tone?: string;
+  keywords?: string;
+}
+
+export async function generateArticle(topic: string, options?: GuidedArticleOptions): Promise<GeneratedArticle> {
+  console.log(`[AI] generateArticle: START topic="${topic}"`, options || "");
   const startTime = Date.now();
+
+  let prompt = `Cerca informazioni aggiornate e scrivi un articolo approfondito su: ${topic}`;
+  if (options?.target) prompt += `\nPubblico target: ${options.target}`;
+  if (options?.tone) prompt += `\nTono dell'articolo: ${options.tone}`;
+  if (options?.keywords) prompt += `\nParole chiave da includere: ${options.keywords}`;
+
   const response = await openai.responses.create({
     model: MODEL,
     tools: [{ type: "web_search_preview" }],
     instructions: ARTICLE_INSTRUCTIONS,
-    input: `Cerca informazioni aggiornate e scrivi un articolo tech approfondito su: ${topic}`,
+    input: prompt,
   });
   console.log(`[AI] generateArticle: API response received in ${Date.now() - startTime}ms, output_text length=${response.output_text.length}`);
 
