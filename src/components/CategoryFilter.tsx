@@ -25,8 +25,9 @@ export default function CategoryFilter() {
   }, []);
 
   // Sort: preferred categories first, then the rest
+  const cats = CATEGORIES as readonly string[];
   const sortedCategories = [
-    ...preferredCategories.filter((c) => CATEGORIES.includes(c)),
+    ...preferredCategories.filter((c) => cats.includes(c)),
     ...CATEGORIES.filter((c) => !preferredCategories.includes(c)),
   ];
 
