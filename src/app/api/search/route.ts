@@ -105,7 +105,7 @@ export async function POST(request: Request) {
     }
 
     // Generate multiple articles with AI
-    const generatedArticles = await searchAndGenerate(sanitizedQuery);
+    const generatedArticles = await searchAndGenerate(sanitizedQuery, user.searchPreference ?? undefined);
     const created = [];
 
     for (const generated of generatedArticles) {

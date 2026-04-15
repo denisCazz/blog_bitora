@@ -128,16 +128,16 @@ export default async function Home({ searchParams }: HomeProps) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-400" />
             </span>
-            Powered by AI · Fonti verificate
+            Powered by AI · Aggiornato ogni giorno
           </div>
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
-            Notizie{" "}
+            Il blog che si{" "}
             <span className="text-shimmer">
-              generate dall&apos;AI
+              adatta a te
             </span>
           </h1>
           <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-            Cerca qualsiasi argomento e l&apos;intelligenza artificiale scriverà articoli approfonditi con fonti autorevoli, in tempo reale.
+            Cerca qualsiasi argomento ti incuriosisce e l&apos;intelligenza artificiale scriverà articoli approfonditi per te, con fonti affidabili, in tempo reale.
           </p>
           <SearchBar />
         </div>
@@ -163,7 +163,7 @@ export default async function Home({ searchParams }: HomeProps) {
                 : "Il blog è ancora vuoto. Usa la barra di ricerca per generare il primo articolo!"}
             </p>
             <p className="text-gray-500 text-sm">
-              Prova a cercare un argomento nella barra di ricerca sopra
+              Prova a cercare qualsiasi argomento ti incuriosisce
             </p>
           </div>
         ) : (

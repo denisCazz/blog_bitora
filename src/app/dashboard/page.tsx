@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SpaceBackground from "@/components/SpaceBackground";
 
 interface User {
   id: string;
@@ -11,6 +12,7 @@ interface User {
   role: string;
   onboardingComplete: boolean;
   preferredCategories: string | null;
+  searchPreference: string | null;
 }
 
 interface Article {
@@ -58,6 +60,25 @@ export default function DashboardPage() {
   const [aiLimit, setAiLimit] = useState<LimitInfo | null>(null);
   const [creatorLimit, setCreatorLimit] = useState<LimitInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [searchPref, setSearchPref] = useState("");
+  const [prefSaving, setPrefSaving] = useState(false);
+  const [prefSaved, setPrefSaved] = useState(false);
+
+  // DB admin state
+  const [dbHealth, setDbHealth] = useState<{ ok: boolean; latency?: number; error?: string } | null>(null);
+  const [dbRunning, setDbRunning] = useState(false);
+  const [dbLog, setDbLog] = useState("");
+  const [dbLogError, setDbLogError] = useState("");
+
+  const checkDbHealth = useCallback(async () => {
+    try {
+      const res = await fetch("/api/db-health");
+      const data = await res.json();
+      setDbHealth(data);
+    } catch {
+      setDbHealth({ ok: false, error: "Non raggiungibile" });
+    }
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -69,6 +90,7 @@ export default function DashboardPage() {
         }
         const data = await res.json();
         setUser(data.user);
+        setSearchPref(data.user.searchPreference ?? "");
 
         if (!data.user.onboardingComplete) {
           router.push("/registrati");
@@ -92,6 +114,7 @@ export default function DashboardPage() {
             const adminData = await adminRes.json();
             setAdminUsers(adminData.users || []);
           }
+          checkDbHealth();
         }
       } catch {
         router.push("/login");
@@ -112,6 +135,44 @@ export default function DashboardPage() {
 
   const isCreator = user.role === "CREATOR";
   const isAdmin = user.role === "ADMIN";
+
+  const savePreference = async () => {
+    if (prefSaving) return;
+    setPrefSaving(true);
+    setPrefSaved(false);
+    try {
+      await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ searchPreference: searchPref }),
+      });
+      setPrefSaved(true);
+      setTimeout(() => setPrefSaved(false), 3000);
+    } finally {
+      setPrefSaving(false);
+    }
+  };
+
+  const runDbPush = async () => {
+    if (dbRunning) return;
+    setDbRunning(true);
+    setDbLog("");
+    setDbLogError("");
+    try {
+      const res = await fetch("/api/admin/db-push", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) {
+        setDbLog(data.stdout || "✓ Schema sincronizzato con successo");
+        checkDbHealth();
+      } else {
+        setDbLogError(data.stderr || data.error || "Errore sconosciuto");
+      }
+    } catch {
+      setDbLogError("Errore di connessione");
+    } finally {
+      setDbRunning(false);
+    }
+  };
 
   const approveArticle = async (id: string, action: "approve" | "reject") => {
     const res = await fetch(`/api/admin/articles/${id}/approve`, {
@@ -136,19 +197,75 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Welcome */}
+    <div className="min-h-screen">
+      {/* Space hero banner */}
+      <div className="relative overflow-hidden py-10 mb-2">
+        <SpaceBackground density="light" />
+        <div className="relative max-w-5xl mx-auto px-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium mb-4"
+            style={{
+              background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(56,189,248,0.05))",
+              borderColor: "rgba(99,102,241,0.3)",
+              color: "#a5b4fc",
+            }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            Dashboard
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-1">
+            Ciao, {user.name}!
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {isCreator
+              ? "Gestisci i tuoi articoli e crea nuovi contenuti"
+              : isAdmin
+              ? "Pannello amministrazione"
+              : "Esplora e genera articoli personalizzati"}
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 pb-16">
+
+      {/* Search Preferences */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-1">
-          Ciao, {user.name}!
-        </h1>
-        <p className="text-gray-500 text-sm">
-          {isCreator
-            ? "Gestisci i tuoi articoli e crea nuovi contenuti"
-            : isAdmin
-            ? "Pannello amministrazione"
-            : "Esplora e genera articoli personalizzati"}
-        </p>
+        <div className="bg-gray-900/50 rounded-2xl border border-gray-800/60 p-5">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+              style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(56,189,248,0.1))" }}>
+              <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-white">Personalizza la tua ricerca AI</h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Scrivi in modo naturale chi sei e cosa ti interessa. L&apos;AI user&agrave; queste preferenze per adattare ogni articolo generato a te.
+              </p>
+            </div>
+          </div>
+          <textarea
+            value={searchPref}
+            onChange={(e) => setSearchPref(e.target.value)}
+            maxLength={500}
+            rows={3}
+            placeholder="Es: Sono un medico, mi interessano salute, ricerca scientifica e tecnologia medica. Preferisco articoli dettagliati con dati e studi."
+            className="w-full bg-gray-800/60 border border-gray-700/60 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 resize-none transition-colors"
+          />
+          <div className="flex items-center justify-between mt-3">
+            <span className="text-xs text-gray-600">{searchPref.length}/500 caratteri</span>
+            <button
+              onClick={savePreference}
+              disabled={prefSaving}
+              className={`px-4 py-2 text-sm font-medium rounded-xl transition-all ${
+                prefSaved
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                  : "bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20"
+              } disabled:opacity-50`}
+            >
+              {prefSaving ? "Salvataggio..." : prefSaved ? "✓ Salvato" : "Salva preferenze"}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Usage cards */}
@@ -310,9 +427,116 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Admin panel */}
-      {isAdmin && adminUsers.length > 0 && (
+      {/* Admin — Database panel */}
+      {isAdmin && (
         <div className="mb-8">
+          <div className="rounded-2xl border overflow-hidden"
+            style={{
+              borderColor: "rgba(99,102,241,0.2)",
+              background: "linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(3,5,14,0.9) 100%)",
+            }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800/60">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)" }}>
+                  <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7c0-2 1-3 3-3h10c2 0 3 1 3 3M4 7h16M10 12h4" />
+                  </svg>
+                </div>
+                <span className="text-white font-semibold text-sm">Database</span>
+              </div>
+              {/* Health badge */}
+              {dbHealth ? (
+                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
+                  dbHealth.ok
+                    ? "bg-green-500/10 border-green-500/20 text-green-400"
+                    : "bg-red-500/10 border-red-500/20 text-red-400"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${dbHealth.ok ? "bg-green-400" : "bg-red-400"}`} />
+                  {dbHealth.ok ? `Online · ${dbHealth.latency}ms` : "Offline"}
+                </div>
+              ) : (
+                <button
+                  onClick={checkDbHealth}
+                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  Verifica stato
+                </button>
+              )}
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Error info */}
+              {dbHealth && !dbHealth.ok && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3">
+                  <p className="text-red-400 text-xs font-mono">{dbHealth.error}</p>
+                </div>
+              )}
+
+              {/* Actions row */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={runDbPush}
+                  disabled={dbRunning}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    background: "rgba(99,102,241,0.1)",
+                    borderColor: "rgba(99,102,241,0.25)",
+                    color: "#a5b4fc",
+                  }}
+                >
+                  {dbRunning ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Sincronizzazione...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Sincronizza schema (db push)
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={checkDbHealth}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-700/50 text-gray-400 hover:text-white hover:border-gray-600 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Verifica stato
+                </button>
+              </div>
+
+              {/* Log output */}
+              {dbLog && (
+                <div className="rounded-xl bg-green-500/10 border border-green-500/20 p-4">
+                  <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap leading-relaxed">{dbLog}</pre>
+                </div>
+              )}
+              {dbLogError && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
+                  <pre className="text-red-400 text-xs font-mono whitespace-pre-wrap leading-relaxed">{dbLogError}</pre>
+                </div>
+              )}
+
+              <p className="text-gray-600 text-xs">
+                Il comando <code className="text-indigo-400/70">prisma db push</code> aggiorna lo schema del database in base al file schema.prisma senza perdita di dati.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin panel */}
+      {isAdmin && adminUsers.length > 0 && (        <div className="mb-8">
           <h2 className="text-lg font-semibold text-white mb-4">
             Utenti ({adminUsers.length})
           </h2>
@@ -412,6 +636,7 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+      </div>{/* /max-w-5xl */}
     </div>
   );
 }

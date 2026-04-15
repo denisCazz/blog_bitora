@@ -33,6 +33,7 @@ model User {
   role                     UserRole @default(READER)
   onboardingComplete       Boolean  @default(false)
   preferredCategories      String?  @db.Text
+  searchPreference         String?  @db.Text
   aiArticlesUsedToday      Int      @default(0)
   aiArticlesResetDate      DateTime @default(now())
   creatorArticlesUsedMonth Int      @default(0)

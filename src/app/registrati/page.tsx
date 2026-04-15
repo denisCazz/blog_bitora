@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/utils";
+import SpaceBackground from "@/components/SpaceBackground";
+import { LogoText } from "@/components/Logo";
 
 type Step = 1 | 2 | 3;
 
@@ -121,8 +123,13 @@ export default function RegistratiPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
+    <div className="relative min-h-[80vh] flex items-center justify-center px-4 py-12 overflow-hidden">
+      <SpaceBackground density="light" />
+      <div className="relative w-full max-w-lg">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <LogoText className="text-2xl" />
+        </div>
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-8">
           {[1, 2, 3].map((s) => (
@@ -153,7 +160,8 @@ export default function RegistratiPage() {
 
             <form
               onSubmit={handleStep1}
-              className="bg-gray-900/50 rounded-2xl border border-gray-800/60 p-6 space-y-4"
+              className="rounded-2xl border border-gray-800/60 p-6 space-y-4"
+              style={{ background: "rgba(3,5,14,0.85)", backdropFilter: "blur(12px)" }}
             >
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1.5">

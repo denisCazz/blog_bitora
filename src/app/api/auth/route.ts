@@ -16,6 +16,7 @@ export async function GET() {
         role: user.role,
         onboardingComplete: user.onboardingComplete,
         preferredCategories: user.preferredCategories,
+        searchPreference: user.searchPreference,
       },
     });
   } catch {

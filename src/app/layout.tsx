@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DbHealthModal from "@/components/DbHealthModal";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -10,14 +11,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Blog Bitora - Notizie Tech powered by AI",
+  title: "Blog Bitora - Articoli su tutto, scritti dall'AI per te",
   description:
-    "Il blog tech italiano powered by AI. Notizie, trend e approfondimenti dal mondo della tecnologia.",
+    "Il blog italiano powered by AI. Sport, tecnologia, salute, cultura, economia e molto altro — cerca qualsiasi argomento e l'AI scriverà un articolo su misura per te.",
   metadataBase: new URL("https://blog.bitora.it"),
   openGraph: {
-    title: "Blog Bitora - Notizie Tech powered by AI",
+    title: "Blog Bitora - Articoli su tutto, scritti dall'AI per te",
     description:
-      "Il blog tech italiano powered by AI. Notizie, trend e approfondimenti dal mondo della tecnologia.",
+      "Il blog italiano powered by AI. Sport, tecnologia, salute, cultura, economia e molto altro — cerca qualsiasi argomento e l'AI scriverà un articolo su misura per te.",
     siteName: "Blog Bitora",
     type: "website",
   },
@@ -35,6 +36,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <DbHealthModal />
       </body>
     </html>
   );

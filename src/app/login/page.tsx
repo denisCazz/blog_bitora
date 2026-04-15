@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SpaceBackground from "@/components/SpaceBackground";
+import { LogoText } from "@/components/Logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -45,8 +47,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative min-h-[80vh] flex items-center justify-center px-4 py-16 overflow-hidden">
+      <SpaceBackground density="light" />
+      <div className="relative w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <LogoText className="text-2xl" />
+        </div>
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">Accedi</h1>
           <p className="text-gray-500 text-sm">
@@ -56,7 +63,8 @@ export default function LoginPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-900/50 rounded-2xl border border-gray-800/60 p-6 space-y-4"
+          className="rounded-2xl border border-gray-800/60 p-6 space-y-4"
+          style={{ background: "rgba(3,5,14,0.85)", backdropFilter: "blur(12px)" }}
         >
           <div>
             <label

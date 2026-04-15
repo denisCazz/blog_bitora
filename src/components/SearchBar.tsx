@@ -160,7 +160,7 @@ export default function SearchBar() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cerca un argomento tech..."
+              placeholder="Cerca qualsiasi argomento..."
               className="flex-1 bg-transparent text-white placeholder-gray-600 px-4 py-4 text-base focus:outline-none"
               disabled={loading}
               maxLength={200}
@@ -191,8 +191,8 @@ export default function SearchBar() {
       {!loading && !articles.length && !error && (
         <p className="text-center text-gray-600 text-xs mt-3">
           {searchMode === "ai" && isLoggedIn
-            ? "L'AI genererà 3 articoli da angolazioni diverse · Es: intelligenza artificiale, cybersecurity, Web3"
-            : "Cerca tra gli articoli esistenti · Accedi per generare articoli con l'AI"}
+            ? "L'AI genererà 3 articoli da angolazioni diverse · Es: calcio italiano, ricette vegane, investimenti, salute"
+            : "Cerca tra gli articoli esistenti · Accedi per generare articoli personalizzati con l'AI"}
         </p>
       )}
 

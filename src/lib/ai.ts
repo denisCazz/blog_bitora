@@ -24,14 +24,15 @@ Il riferimento deve essere contestuale e naturale, mai forzato.
 Quando includi un riferimento a Bitora, segna promoted: true nel JSON.
 `;
 
-const ARTICLE_INSTRUCTIONS = `Sei un giornalista esperto italiano. Scrivi articoli per blog Bitora (blog.bitora.it), un blog italiano di informazione su vari argomenti.
+const ARTICLE_INSTRUCTIONS = `Sei un giornalista esperto italiano. Scrivi articoli per il Blog Bitora (blog.bitora.it), un blog italiano di informazione su qualsiasi argomento — dalla tecnologia allo sport, dalla salute alla cultura, dall'economia all'intrattenimento.
 
 IMPORTANTE: Usa il tool web_search per cercare informazioni REALI e AGGIORNATE sull'argomento PRIMA di scrivere. 
 Fai ALMENO 2-3 ricerche web per raccogliere dati, statistiche, notizie recenti e fonti autorevoli.
 
 Regole:
 - Scrivi SEMPRE in italiano
-- Usa un tono professionale ma accessibile
+- Usa un tono chiaro, coinvolgente e accessibile a tutti — non dare per scontata nessuna competenza tecnica
+- Spiega termini complessi in modo semplice quando necessario
 - L'articolo deve essere lungo almeno 800 parole
 - Usa formattazione Markdown (## per sottotitoli, **bold**, elenchi puntati)
 - Basa l'articolo SOLO su informazioni trovate tramite la ricerca web — NON inventare dati o statistiche
@@ -88,7 +89,7 @@ export interface GuidedArticleOptions {
   keywords?: string;
 }
 
-export async function generateArticle(topic: string, options?: GuidedArticleOptions): Promise<GeneratedArticle> {
+export async function generateArticle(topic: string, options?: GuidedArticleOptions, userPreference?: string): Promise<GeneratedArticle> {
   console.log(`[AI] generateArticle: START topic="${topic}"`, options || "");
   const startTime = Date.now();
 
@@ -96,6 +97,7 @@ export async function generateArticle(topic: string, options?: GuidedArticleOpti
   if (options?.target) prompt += `\nPubblico target: ${options.target}`;
   if (options?.tone) prompt += `\nTono dell'articolo: ${options.tone}`;
   if (options?.keywords) prompt += `\nParole chiave da includere: ${options.keywords}`;
+  if (userPreference) prompt += `\n\nPreferenze del lettore (adatta di conseguenza il taglio, il livello di approfondimento e gli esempi): ${userPreference}`;
 
   const response = await openai.responses.create({
     model: MODEL,
@@ -160,13 +162,13 @@ Rispondi con un oggetto JSON con chiave "topics" contenente un array di stringhe
   return articles;
 }
 
-export async function searchAndGenerate(query: string): Promise<GeneratedArticle[]> {
+export async function searchAndGenerate(query: string, userPreference?: string): Promise<GeneratedArticle[]> {
   console.log(`[AI] searchAndGenerate: START query="${query}"`);
   const startTime = Date.now();
   const angles = await generateSearchAngles(query);
   console.log(`[AI] searchAndGenerate: got ${angles.length} angles, generating articles in parallel...`);
   const results = await Promise.allSettled(
-    angles.map((angle) => generateArticle(angle))
+    angles.map((angle) => generateArticle(angle, undefined, userPreference))
   );
   const succeeded = results.filter((r): r is PromiseFulfilledResult<GeneratedArticle> => r.status === "fulfilled");
   const failed = results.filter((r) => r.status === "rejected");
