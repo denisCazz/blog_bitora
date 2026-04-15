@@ -217,9 +217,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </p>
           </div>
         ) : (
-          <div className="bg-gray-900/30 rounded-2xl border border-gray-800/60 p-5 sm:p-8 md:p-12">
+          <div className="bg-gray-900/30 rounded-2xl border border-gray-800/60 p-5 sm:p-8 md:p-12 overflow-hidden">
             <div
-              className="prose-custom"
+              className="prose-custom min-w-0"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
             />
           </div>
@@ -238,7 +238,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         )}
 
         {/* Vote + Share + Edit */}
-        <div className="mt-8 flex flex-wrap items-center gap-4">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <VoteButton articleId={article.id} />
           <ShareButtons
             url={`https://blog.bitora.it/articolo/${article.slug}`}

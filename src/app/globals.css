@@ -65,6 +65,7 @@
 /* ── Deep space global background ─────────────────────── */
 html, body {
   background-color: #03050e !important;
+  overflow-x: hidden;
 }
 
 /* Fixed nebula layer behind everything */
@@ -123,6 +124,13 @@ html, body {
 }
 
 /* Markdown content styles */
+.prose-custom {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 .prose-custom h1 {
   font-size: 1.875rem;
   font-weight: 700;
@@ -184,6 +192,8 @@ html, body {
   color: #60a5fa;
   text-decoration: underline;
   text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+  word-break: break-all;
 }
 
 .prose-custom a:hover {
@@ -211,6 +221,7 @@ html, body {
 .prose-custom img {
   border-radius: 0.75rem;
   max-width: 100%;
+  width: 100%;
   height: auto;
   margin: 1.5rem 0;
 }
@@ -230,6 +241,10 @@ html, body {
   padding: 1.25rem;
   overflow-x: auto;
   margin: 1.5rem 0;
+  max-width: 100%;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .prose-custom pre code {
