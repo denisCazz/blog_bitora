@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import SearchBar from "@/components/SearchBar";
 import ArticleCard from "@/components/ArticleCard";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -37,6 +38,15 @@ async function getTopVoted() {
   });
 }
 
+async function getRecommended(preferredCategories: string[]) {
+  if (!preferredCategories.length) return [];
+  return prisma.article.findMany({
+    where: { published: true, category: { in: preferredCategories } },
+    orderBy: { createdAt: "desc" },
+    take: 3,
+  });
+}
+
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const category = params.category;
@@ -44,13 +54,23 @@ export default async function Home({ searchParams }: HomeProps) {
   const { articles, pages } = await getArticles(category, page);
   const topVoted = !category && page === 1 ? await getTopVoted() : [];
 
+  // Personalized recommendations for logged-in users
+  const currentUser = !category && page === 1 ? await getCurrentUser() : null;
+  const preferredCategories: string[] = (() => {
+    if (!currentUser?.preferredCategories) return [];
+    try { return JSON.parse(currentUser.preferredCategories); } catch { return []; }
+  })();
+  const recommended = !category && page === 1 && preferredCategories.length > 0
+    ? await getRecommended(preferredCategories)
+    : [];
+
   const featured = articles[0];
   const rest = articles.slice(1);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section — deep space */}
-      <section className="relative py-20 sm:py-28 md:py-40 overflow-hidden">
+      <section className="relative py-20 sm:py-28 md:py-40 pb-28 sm:pb-36 md:pb-52 overflow-hidden">
 
         {/* Dense starfield — 150 stars */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -112,7 +132,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
 
         {/* Subtle vignette so text stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#03050e]/30 to-[#03050e]/70 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#03050e]/30 to-[#03050e] pointer-events-none" />
         {/* Bottom horizon glow */}
         <div className="absolute bottom-0 inset-x-0 h-32 hero-horizon pointer-events-none" />
 
@@ -144,7 +164,7 @@ export default async function Home({ searchParams }: HomeProps) {
       </section>
 
       {/* Articles Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 -mt-8 relative z-10">
         <div className="mb-8">
           <Suspense fallback={null}>
             <CategoryFilter />
@@ -283,6 +303,74 @@ export default async function Home({ searchParams }: HomeProps) {
           </>
         )}
       </section>
+
+      {/* Personalized Recommendations */}
+      {recommended.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
+          <div className="flex items-center gap-2 mb-5">
+            <span className="text-lg">✨</span>
+            <h2 className="text-xl font-bold text-white">Potrebbe interessarti</h2>
+            <span className="ml-2 px-2 py-0.5 text-[11px] rounded-full border border-indigo-500/30 text-indigo-400"
+              style={{ background: "rgba(99,102,241,0.08)" }}>
+              basato sui tuoi interessi
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {recommended.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* How It Works — tutorial */}
+      {!category && page === 1 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-white mb-2">Come funziona Bitora Blog</h2>
+            <p className="text-gray-500 text-sm">Tre passi per leggere articoli su qualsiasi argomento</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                step: "01",
+                icon: "🔍",
+                title: "Cerca qualsiasi argomento",
+                desc: "Scrivi di cosa vuoi leggere — calcio, salute, finanza, viaggi, tecnologia. Nessun limite.",
+                color: "rgba(56,189,248,0.12)",
+                border: "rgba(56,189,248,0.2)",
+              },
+              {
+                step: "02",
+                icon: "🤖",
+                title: "L'AI scrive articoli per te",
+                desc: "L'intelligenza artificiale genera in tempo reale 3 articoli approfonditi da punti di vista diversi, con fonti reali.",
+                color: "rgba(99,102,241,0.12)",
+                border: "rgba(99,102,241,0.2)",
+              },
+              {
+                step: "03",
+                icon: "⚙️",
+                title: "Personalizza la tua esperienza",
+                desc: "Registrati per un'esperienza su misura: scegli i tuoi interessi, configura l'AI, votare e commentare gli articoli.",
+                color: "rgba(192,132,252,0.12)",
+                border: "rgba(192,132,252,0.2)",
+              },
+            ].map(({ step, icon, title, desc, color, border }) => (
+              <div
+                key={step}
+                className="relative rounded-2xl p-6 flex flex-col gap-4"
+                style={{ background: color, border: `1px solid ${border}` }}
+              >
+                <span className="absolute top-5 right-5 text-[11px] font-mono text-gray-600">{step}</span>
+                <div className="text-3xl">{icon}</div>
+                <h3 className="text-base font-semibold text-white">{title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Bitora CTA Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">

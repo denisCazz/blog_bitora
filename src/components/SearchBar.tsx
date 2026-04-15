@@ -52,6 +52,16 @@ export default function SearchBar() {
 
   useEffect(() => {
     if (!loading) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!loading) return;
     const interval = setInterval(() => {
       setLoadingStep((s) => (s + 1) % LOADING_STEPS.length);
     }, 3000);
@@ -160,7 +170,11 @@ export default function SearchBar() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cerca qualsiasi argomento..."
+              placeholder={
+                searchMode === "ai" && isLoggedIn
+                  ? "Crea un articolo su..."
+                  : "Cerca qualsiasi argomento..."
+              }
               className="flex-1 bg-transparent text-white placeholder-gray-600 px-4 py-4 text-base focus:outline-none"
               disabled={loading}
               maxLength={200}
@@ -194,6 +208,15 @@ export default function SearchBar() {
             ? "L'AI genererà 3 articoli da angolazioni diverse · Es: calcio italiano, ricette vegane, investimenti, salute"
             : "Cerca tra gli articoli esistenti · Accedi per generare articoli personalizzati con l'AI"}
         </p>
+      )}
+
+      {loading && searchMode === "ai" && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-amber-400/80">
+          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 4a8 8 0 100 16 8 8 0 000-16z" />
+          </svg>
+          <span>Rimani su questa pagina per ricevere gli articoli generati</span>
+        </div>
       )}
 
       {/* Loading — cosmic AI animation */}

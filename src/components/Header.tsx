@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES } from "@/lib/utils";
 import Logo, { LogoText } from "@/components/Logo";
 
 interface UserInfo {
@@ -55,15 +54,6 @@ export default function Header() {
             >
               Home
             </Link>
-            {CATEGORIES.slice(0, 5).map((cat) => (
-              <Link
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
-                className="px-3 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
-              >
-                {cat}
-              </Link>
-            ))}
             <div className="w-px h-5 bg-gray-800 mx-2" />
             <a
               href="https://bitora.it"
@@ -179,16 +169,6 @@ export default function Header() {
             >
               Home
             </Link>
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
-                className="block px-3 py-2.5 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5"
-                onClick={() => setMenuOpen(false)}
-              >
-                {cat}
-              </Link>
-            ))}
             <a
               href="https://bitora.it"
               target="_blank"
