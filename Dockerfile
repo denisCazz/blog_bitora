@@ -46,8 +46,11 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/src/generated ./src/generated
 
-# Copy node_modules needed for prisma db push at startup
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Copy only the Prisma CLI packages needed for prisma db push at startup
+# (Next.js standalone already bundles its own node_modules for the app)
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy startup script
 COPY --chown=nextjs:nodejs startup.sh ./startup.sh
