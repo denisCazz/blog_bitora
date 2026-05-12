@@ -97,7 +97,11 @@ export default function EditArticlePage({
       const data = await res.json();
       setSuccess(true);
       setTimeout(() => {
-        router.push(`/articolo/${data.article.slug}`);
+        if (data.article.isDraft || !data.article.published) {
+          router.push("/dashboard");
+        } else {
+          router.push(`/articolo/${data.article.slug}`);
+        }
         router.refresh();
       }, 1000);
     } catch {

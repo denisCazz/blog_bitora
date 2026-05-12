@@ -108,7 +108,7 @@ export default function RegistratiPage() {
         return;
       }
 
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch {
       setError("Errore di connessione");
     } finally {
