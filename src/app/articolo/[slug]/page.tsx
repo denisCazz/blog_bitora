@@ -13,6 +13,7 @@ import CommentSection from "@/components/CommentSection";
 import ShareButtons from "@/components/ShareButtons";
 import Image from "next/image";
 import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/auth";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -28,6 +29,17 @@ async function getArticle(slug: string) {
     },
   });
   return article;
+}
+
+async function getDraftArticle(slug: string) {
+  return prisma.article.findUnique({
+    where: { slug },
+    include: {
+      author: {
+        select: { id: true, name: true, role: true },
+      },
+    },
+  });
 }
 
 async function getRelatedArticles(category: string, excludeId: string) {
@@ -123,7 +135,23 @@ function renderMarkdown(content: string): string {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  let article = await getArticle(slug);
+  let isDraft = false;
+
+  if (!article) {
+    // Check if it's a draft the current user is allowed to preview
+    const draft = await getDraftArticle(slug);
+    if (draft) {
+      const currentUser = await getCurrentUser();
+      if (
+        currentUser &&
+        (currentUser.role === "ADMIN" || draft.authorId === currentUser.id)
+      ) {
+        article = draft;
+        isDraft = true;
+      }
+    }
+  }
 
   if (!article) {
     notFound();
@@ -162,6 +190,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </svg>
             Torna alla home
           </Link>
+
+          {isDraft && (
+            <div className="mb-6 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm font-medium">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15H9v-2.828z" />
+              </svg>
+              Bozza — non ancora pubblicata, visibile solo a te
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center gap-2.5 mb-5">
             <span
